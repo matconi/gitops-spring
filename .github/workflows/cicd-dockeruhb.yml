@@ -58,10 +58,10 @@ jobs:
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
       - name: Build Docker image
-        run: docker build -t ${{ github.GITHUB_REPOSITORY }}:${{ github.sha }} ./module
+        run: docker build -t ${{ github.repository }}:${{ github.sha }} ./module
       
       - name: Push Docker image to Docker Hub
         run: |
-          docker tag ${{ github.GITHUB_REPOSITORY }}:${{ github.sha }}
-          docker push docker.io/${{ github.GITHUB_REPOSITORY }}:${{ github.sha }}    
-          docker push docker.io/${{ github.GITHUB_REPOSITORY }}:latest   
+          docker tag ${{ github.repository }}:${{ github.sha }}
+          docker push docker.io/${{ github.repository }}:${{ github.sha }}    
+          docker push docker.io/${{ github.repository }}:latest   
