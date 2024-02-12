@@ -62,6 +62,6 @@ jobs:
       
       - name: Push Docker image to Docker Hub
         run: |
-          docker tag ${{ github.repository }}:${{ github.sha }}
+          docker tag ${{ github.repository }}:${{ github.sha }} ${{ github.repository }}:${{ github.sha }}
           docker push docker.io/${{ github.repository }}:${{ github.sha }}    
           docker push docker.io/${{ github.repository }}:latest   
