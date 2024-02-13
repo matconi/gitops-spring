@@ -80,8 +80,7 @@ jobs:
 
       - name: Update Kubernetes resources
         run: |
-          pwd
-          cd k8s
+          cd /module/k8s
           kustomize edit set image server=${{ github.repository }}:${{ github.sha }}
 
       - name: Commit changes
