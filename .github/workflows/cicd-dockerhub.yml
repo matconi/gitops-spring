@@ -79,10 +79,8 @@ jobs:
           kustomize-version: "3.6.1"
 
       - name: Update Kubernetes resources
-        run: |
-          pwd
-          cd k8s
-          kustomize edit set image server=${{ github.repository }}:${{ github.sha }}
+        working-directory: ./module/k8s
+        run: kustomize edit set image server=${{ github.repository }}:${{ github.sha }}
 
       - name: Commit changes
         run: |
