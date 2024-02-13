@@ -73,6 +73,9 @@ jobs:
       - publish-image
 
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
       - name: Setup Kustomize
         uses: imranismail/setup-kustomize@v2
         with: 
