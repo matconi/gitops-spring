@@ -1,9 +1,9 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - deployment.yaml
-  - service.yaml
+- deployment.yaml
+- service.yaml
 images:
-  - name: server
-    newName: gitops-spring
-    newTag: bar
+- name: server
+  newName: matconi/gitops-spring
+  newTag: aa297b7e94f6428fcdeb5b82380df83e04f57258
