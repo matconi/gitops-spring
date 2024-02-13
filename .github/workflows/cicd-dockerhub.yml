@@ -62,7 +62,7 @@ jobs:
       
       - name: Push image to Docker Hub
         run: |
-          docker push ${{ github.repository }}:${{ github.sha }}    
+          docker push ${{ github.repository }}:${{ github.sha }}
           docker push ${{ github.repository }}:latest
    
   bump-version:
@@ -80,6 +80,7 @@ jobs:
 
       - name: Update Kubernetes resources
         run: |
+          pwd
           cd k8s
           kustomize edit set image server=${{ github.repository }}:${{ github.sha }}
 
