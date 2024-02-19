@@ -1,4 +1,4 @@
-package domain.company.project.module.controller;
+package domain.company.project.module.controllers;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
