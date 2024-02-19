@@ -1,13 +1,11 @@
 package domain.company.project.module;
 
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
-import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 
 @SpringBootApplication
-@EnableAutoConfiguration(exclude={DataSourceAutoConfiguration.class, HibernateJpaAutoConfiguration.class})
+@EntityScan(basePackages = {"domain.company.project.module.domain.entities"})
 public class ModuleApplication {
     public static void main(String[] args) {
         SpringApplication.run(ModuleApplication.class, args);
