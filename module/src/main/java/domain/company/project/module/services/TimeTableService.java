@@ -1,11 +1,10 @@
 package domain.company.project.module.services;
 
-import domain.company.project.module.domain.entities.Lesson;
 import domain.company.project.module.domain.entities.Room;
 import domain.company.project.module.domain.entities.Timeslot;
 import domain.company.project.module.repositories.LessonRepository;
 import domain.company.project.module.repositories.RoomRepository;
-import domain.company.project.module.repositories.TimeSlotRepository;
+import domain.company.project.module.repositories.TimeslotRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,7 +17,7 @@ import java.util.List;
 public class TimeTableService {
 
     @Autowired
-    TimeSlotRepository timeslotRepository;
+    TimeslotRepository timeslotRepository;
     @Autowired
     RoomRepository roomRepository;
     @Autowired
@@ -51,10 +50,6 @@ public class TimeTableService {
         timeslotList.add(new Timeslot(DayOfWeek.FRIDAY, LocalTime.of(10, 30), LocalTime.of(11, 30)));
         timeslotList.add(new Timeslot(DayOfWeek.FRIDAY, LocalTime.of(13, 30), LocalTime.of(14, 30)));
         timeslotList.add(new Timeslot(DayOfWeek.FRIDAY, LocalTime.of(14, 30), LocalTime.of(15, 30)));
-        Timeslot teste = new Timeslot(DayOfWeek.MONDAY, LocalTime.of(8, 30), LocalTime.of(9, 30));
-        System.out.println("vai vai: " + teste);
-        System.out.println("vem bosta: " + timeslotList.get(0));
-        System.out.println("vem mais bosta: " + timeslotList.get(0).getDayOfWeek());
         timeslotRepository.saveAll(timeslotList);
 
         List<Room> roomList = new ArrayList<>();

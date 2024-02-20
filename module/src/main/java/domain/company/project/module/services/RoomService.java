@@ -48,10 +48,10 @@ public class RoomService {
 
     public RoomResponse findRoomById(Long id){
         Room room = this.findById(id);
-        RoomResponse roomResponse = new RoomResponse();
-        roomResponse.setId(room.getId());
-        roomResponse.setName(room.getName());
-        return roomResponse;
+        RoomResponse response = new RoomResponse();
+        response.setId(room.getId());
+        response.setName(room.getName());
+        return response;
     }
 
     public RoomResponse updateRoom(RoomRequest request, Long id) {
