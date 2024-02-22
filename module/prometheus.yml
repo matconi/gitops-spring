@@ -1,0 +1,30 @@
+global:
+  scrape_interval:     15s # Set the scrape interval to every 15 seconds. Default is every 1 minute.
+  evaluation_interval: 15s # Evaluate rules every 15 seconds. The default is every 1 minute.
+
+rule_files:
+
+scrape_configs:
+  - job_name: cadvisor
+    scrape_interval: 5s
+    static_configs:
+      - targets:
+          - cadvisor-exporter:8080
+
+  - job_name: prometheus
+    scrape_interval: 5s
+    static_configs:
+      - targets:
+        - prometheus:9090
+
+  - job_name: module-app
+    scrape_interval: 5s
+    metrics_path: "/actuator/prometheus"
+    static_configs:
+      - targets:
+          - module-app:800
+
+  - job_name: postgres-module
+    static_configs:
+      - targets:
+        - postgres-exporter:9187

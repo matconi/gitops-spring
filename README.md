@@ -2,7 +2,7 @@
 
 Baseado no repositório: [devfullcycle/gitopsfc](https://github.com/devfullcycle/gitopsfc)
 
-POC para sistema de gerenciamento de grade horária.
+Prévia do sistema de gerenciamento de grade horária.
 
 ## Ferramentas utilizadas:
 - Spring Boot com Maven

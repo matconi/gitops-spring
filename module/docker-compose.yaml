@@ -1,0 +1,96 @@
+version: '3.9'
+
+networks:
+  module-network:
+    driver: bridge
+
+volumes:
+  grafana-data:
+
+services:
+  postgres-module:
+    container_name: postgres-module
+    image: postgres:15-alpine
+    ports:
+      - "5432:5432"
+    restart: always
+    volumes:
+      - ./data/postgres/data:/var/lib/postgresql/data/
+    env_file:
+      - ./src/main/resources/secrets.properties
+    depends_on:
+      - prometheus
+    networks:
+      - module-network
+
+  module-app:
+    container_name: module-app
+    image: matconi/gitops-spring
+    build: .
+    ports:
+      - "800:800"
+    env_file:
+      - ./src/main/resources/secrets.properties
+    depends_on:
+      - postgres-module
+      - prometheus
+    networks:
+      - module-network
+
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    networks:
+      - module-network
+
+  grafana:
+    container_name: grafana
+    image: grafana/grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+    depends_on:
+      - prometheus
+    networks:
+      - module-network
+
+  cadvisor-exporter:
+    image: gcr.io/cadvisor/cadvisor:latest
+    container_name: cadvisor-exporter
+    user: root
+    ports:
+      - "8080:8080"
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      - prometheus
+    networks:
+      - module-network
+
+  postgres-exporter:
+    image: prometheuscommunity/postgres-exporter
+    container_name: postgres-exporter
+    ports:
+      - 9187:9187
+    env_file:
+      - ./src/main/resources/secrets.properties
+    environment:
+      DATA_SOURCE_NAME: "postgresql://${POSTGRES_USERNAME}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}?sslmode=disable"
+    links:
+      - postgres-module
+      - prometheus
+    depends_on:
+      - postgres-module
+      - prometheus
+    networks:
+      - module-network

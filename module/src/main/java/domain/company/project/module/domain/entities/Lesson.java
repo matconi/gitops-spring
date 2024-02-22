@@ -14,7 +14,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @PlanningEntity
 @Entity
-@Table(name = "rooms")
+@Table(name = "lessons")
 public class Lesson {
 
     @PlanningId
