@@ -5,6 +5,8 @@ server:
 spring:
   config:
     import: optional:secrets.properties
+  application:
+    name: module
   datasource:
     url: ${SPRING_DATASOURCE_URL}
     username: ${POSTGRES_USER}
@@ -36,3 +38,15 @@ management:
       enabled: true
     prometheus:
       enabled: true
+  otlp:
+    metrics:
+      export:
+        url: http://localhost:4318/v1/metrics
+        step: 10s
+    tracing:
+      endpoint: http://localhost:4318/v1/traces
+      export:
+        step: 10s # Export interval set to 10 seconds
+  tracing:
+    sampling:
+      probability: 1.0
