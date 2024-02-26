@@ -31,18 +31,35 @@ services:
       - "800:800"
     env_file:
       - ./src/main/resources/secrets.properties
-      - ./opentelemetry-collector/otel.env
+      - ./docker/otel-collector/otel.env
     volumes:
-      - ./opentelemetry-javaagent.jar:/etc/opentelemetry-javaagent.jar
+      - ./otel-javaagent.jar:/etc/otel-javaagent.jar
     depends_on:
       - postgres-module
       - prometheus
     networks:
       - module-network
 
-  opentelemetry-collector:
+  keycloak:
+    image: quay.io/keycloak/keycloak
+    container_name: keycloak
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    command:
+      - start-dev
+      - --import-realm
+      - --http-port=8081
+    ports:
+      - "8081:8081"
+    volumes:
+      - /home/keycloak/realm.json:/opt/keycloak/data/import/realm.json
+    depends_on:
+      - postgres-module
+
+  otel-collector:
     image: otel/opentelemetry-collector:0.85.0
-    container_name: opentelemetry-collector
+    container_name: otel-collector
     deploy:
       resources:
         limits:
@@ -55,7 +72,7 @@ services:
       - "8889:8889"   # Prometheus exporter
       - "13133:13133" # Health check
     volumes:
-      - ./opentelemetry-collector/config.yml:/etc/otelcol/config.yaml
+      - ./docker/otel-collector/config.yml:/etc/otelcol/config.yaml
     networks:
       - module-network
 
@@ -68,7 +85,9 @@ services:
     command:
       - -config.file=/etc/tempo.yml
     volumes:
-      - ./tempo/tempo.yml:/etc/tempo.yml
+      - ./docker/tempo/tempo.yml:/etc/tempo.yml
+    networks:
+      - module-network
 
   prometheus:
     image: prom/prometheus
@@ -78,7 +97,7 @@ services:
     command:
       - --config.file=/etc/prometheus/prometheus.yml
     volumes:
-      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./docker/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
     networks:
       - module-network
 
