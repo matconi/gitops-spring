@@ -12,6 +12,10 @@ Prévia do sistema de gerenciamento de grade horária.
 - GitHub Actions
 - Kubernetes
 - ArgoCD
+- Prometheus/Grafana
+- Keycloak
+- Spring Cloud Gateway
+- Service Discovery (Eureka)
 ## Contribuições
 
 Contribuições são bem-vindas. Sinta-se à vontade para abrir issues e pull requests para sugerir melhorias, corrigir problemas ou adicionar novas etapas.

@@ -1,0 +1,36 @@
+server:
+  port: 7000
+eureka:
+  client:
+    fetch-register: true
+    register-with-eureka: true
+    defaultZone: http://localhost:8761/eureka
+spring:
+  config:
+    import: optional:secrets.properties
+  application:
+    name: gateway
+  cloud:
+    gateway:
+      routes:
+        - id: module
+          uri: lb://module
+          predicates:
+            - Path=/module/**
+          filters:
+            - RewritePath=/module/(?<path>.*), /$\{path}
+        - id: keycloak
+          uri: http://localhost:8081
+          predicates:
+            - Path=/auth/**
+          filters:
+            - RewritePath=/auth/(?<path>.*), /$\{path}
+  security:
+    oauth2:
+      resourceserver:
+        opaquetoken:
+          introspection-uri: http://localhost:8081/realms/realm/protocol/openid-connect/token/introspect
+          client-id: module-app-id
+          client-secret: ${CLIENT_SECRET}
+        jwt:
+          issuer-uri: http://localhost:8081/realms/realm

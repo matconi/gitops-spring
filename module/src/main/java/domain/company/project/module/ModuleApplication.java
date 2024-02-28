@@ -11,6 +11,6 @@ import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 public class ModuleApplication {
     public static void main(String[] args) {
         SpringApplication.run(ModuleApplication.class, args);
-        System.out.println("Running mod...............");
+        System.out.println("Running module...............");
     }
 }

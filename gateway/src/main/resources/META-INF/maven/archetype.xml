@@ -1,5 +1,5 @@
 <archetype>
-  <id>proxy</id>
+  <id>gateway</id>
   <sources>
     <source>src/main/java/App.java</source>
   </sources>

@@ -6,7 +6,7 @@
 	<modules>
 		<module>module</module>
         <module>eureka</module>
-        <module>proxy</module>
+        <module>gateway</module>
     </modules>
 	<groupId>domain.company.project</groupId>
 	<artifactId>gitops</artifactId>
