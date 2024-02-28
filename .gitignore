@@ -34,3 +34,4 @@ build/
 __localcode
 secrets.*
 module/data
+module/keycloak_data

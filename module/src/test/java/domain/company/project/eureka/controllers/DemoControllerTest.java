@@ -1,4 +1,4 @@
-package domain.company.project.module.controllers;
+package domain.company.project.eureka.controllers;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

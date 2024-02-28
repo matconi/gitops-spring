@@ -5,6 +5,8 @@
 	<packaging>pom</packaging>
 	<modules>
 		<module>module</module>
+        <module>eureka</module>
+        <module>proxy</module>
     </modules>
 	<groupId>domain.company.project</groupId>
 	<artifactId>gitops</artifactId>

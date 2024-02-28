@@ -1,0 +1,32 @@
+server:
+  port: 7000
+eureka:
+  client:
+    fetch-register: true
+    register-with-eureka: true
+    defaultZone: http://localhost:8761/eureka
+spring:
+  application:
+    name: proxy
+  cloud:
+    gateway:
+      routes:
+        - id: module
+          uri: lb://module
+          predicates:
+            - Path=/module/**
+          filters:
+            - RewritePath=/module/(?<path>.*), /$\{path}
+  security:
+    oauth2:
+      client:
+        provider:
+          my-keycloak-provider:
+            issuer-uri: http://localhost:8081/auth/realms/realm
+        registration:
+          gateway:
+            provider: my-keycloak-provider
+            client-id: module-app-id
+            client-secret: fc36fd82-7042-4287-aef0-e9f8603abd02
+            authorization-grant-type: authorization_code
+            redirect-uri: '{baseUrl}/login/oauth2/code/keycloak'
