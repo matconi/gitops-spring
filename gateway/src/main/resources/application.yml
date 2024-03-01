@@ -1,3 +1,5 @@
+vars:
+  keycloak-url: http://localhost:8081
 server:
   port: 7000
 eureka:
@@ -7,7 +9,7 @@ eureka:
     defaultZone: http://localhost:8761/eureka
 spring:
   config:
-    import: optional:secrets.properties
+    import: optional:secrets.yml
   application:
     name: gateway
   cloud:
@@ -19,15 +21,26 @@ spring:
             - Path=/module/**
           filters:
             - RewritePath=/module/(?<path>.*), /$\{path}
+            - DedupeResponseHeader=Access-Control-Allow-Credentials Access-Control-Allow-Origin
+            - TokenRelay=
         - id: keycloak
-          uri: http://localhost:8081
+          uri: ${vars.keycloak-url}
           predicates:
             - Path=/auth/**
           filters:
             - RewritePath=/auth/(?<path>.*), /$\{path}
   security:
     oauth2:
-      resourceserver:
-        jwt:
-          issuer-uri: http://localhost:8081/realms/realm
-          jwk-set-uri: ${spring.security.oauth2.resourceserver.jwt.issuer-uri}/protocol/openid-connect/certs
+      client:
+        provider:
+          keycloak:
+            issuer-uri: ${vars.keycloak-url}/realms/realm
+        registration:
+          keycloak:
+            client-id: ${secrets.client-id}
+            authorization-grant-type: authorization_code
+            client-secret: ${secrets.client-secret}
+            provider: keycloak
+            scope:
+            - openid
+            user-name-attribute: preferred_username
