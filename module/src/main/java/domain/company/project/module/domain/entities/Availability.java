@@ -30,13 +30,4 @@ public class Availability {
 
     @Column(name = "endTime", length = 120)
     private LocalTime endTime;
-
-    @Override
-    public String toString() {
-        return "Availability{" +
-                "dayOfWeek=" + dayOfWeek +
-                ", startTime=" + startTime +
-                ", endTime=" + endTime +
-                '}';
-    }
 }

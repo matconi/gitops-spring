@@ -2,11 +2,11 @@ server:
   servlet:
     context-path: /
   port: 800
-eureka:
-  client:
-    fetch-register: true
-    register-with-eureka: true
-    defaultZone: http://localhost:8761/eureka
+#eureka:
+#  client:
+#    fetch-register: true
+#    register-with-eureka: true
+#    defaultZone: http://localhost:8761/eureka
 spring:
   config:
     import: optional:secrets.properties
@@ -30,10 +30,16 @@ spring:
           issuer-uri: http://localhost:8081/realms/realm
           jwk-set-uri: ${spring.security.oauth2.resourceserver.jwt.issuer-uri}/protocol/openid-connect/certs
 
-optaplanner:
+timefold:
   solver:
     termination:
       spent-limit: 5s
+
+logging:
+  level:
+    ai:
+      #timefold:
+        #solver: debug
 
 management:
   endpoints:
