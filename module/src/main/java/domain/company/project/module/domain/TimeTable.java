@@ -1,17 +1,20 @@
 package domain.company.project.module.domain;
 
+import ai.timefold.solver.core.api.domain.constraintweight.ConstraintConfigurationProvider;
+import domain.company.project.module.config.TimeTableConstraintConfiguration;
 import domain.company.project.module.domain.entities.Lesson;
 import domain.company.project.module.domain.entities.Room;
 import domain.company.project.module.domain.entities.Timeslot;
+import domain.company.project.module.solver.Constraint;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.optaplanner.core.api.domain.solution.PlanningEntityCollectionProperty;
-import org.optaplanner.core.api.domain.solution.PlanningScore;
-import org.optaplanner.core.api.domain.solution.PlanningSolution;
-import org.optaplanner.core.api.domain.solution.ProblemFactCollectionProperty;
-import org.optaplanner.core.api.domain.valuerange.ValueRangeProvider;
-import org.optaplanner.core.api.score.buildin.hardsoft.HardSoftScore;
-import org.optaplanner.core.api.solver.SolverStatus;
+import ai.timefold.solver.core.api.domain.solution.PlanningEntityCollectionProperty;
+import ai.timefold.solver.core.api.domain.solution.PlanningScore;
+import ai.timefold.solver.core.api.domain.solution.PlanningSolution;
+import ai.timefold.solver.core.api.domain.solution.ProblemFactCollectionProperty;
+import ai.timefold.solver.core.api.domain.valuerange.ValueRangeProvider;
+import ai.timefold.solver.core.api.score.buildin.hardsoft.HardSoftScore;
+import ai.timefold.solver.core.api.solver.SolverStatus;
 
 import java.util.List;
 
@@ -20,20 +23,25 @@ import java.util.List;
 @PlanningSolution
 public class TimeTable {
 
-    @ProblemFactCollectionProperty
-    @ValueRangeProvider
-    private List<Timeslot> timeslotList;
+    @ConstraintConfigurationProvider
+    private TimeTableConstraintConfiguration timeTableConstraintConfiguration;
+
+    private List<Constraint> constraints;
 
     @ProblemFactCollectionProperty
     @ValueRangeProvider
-    private List<Room> roomList;
+    private List<Timeslot> timeslots;
+
+    @ProblemFactCollectionProperty
+    @ValueRangeProvider
+    private List<Room> rooms;
 
     @PlanningEntityCollectionProperty
-    private List<Lesson> lessonList;
+    private List<Lesson> lessons;
 
     @PlanningScore
     private HardSoftScore score;
 
-    // Ignored by OptaPlanner, used by the UI to display solve or stop solving button
+    // Ignored by Timefold, used by the UI to display solve or stop solving button
     private SolverStatus solverStatus;
 }

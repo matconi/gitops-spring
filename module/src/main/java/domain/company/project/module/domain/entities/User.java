@@ -3,7 +3,6 @@ package domain.company.project.module.domain.entities;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.optaplanner.core.api.domain.lookup.PlanningId;
 
 import javax.persistence.*;
 
@@ -13,8 +12,6 @@ import javax.persistence.*;
 @Entity
 @Table(name = "users")
 public class User {
-
-    @PlanningId
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

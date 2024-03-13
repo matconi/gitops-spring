@@ -20,6 +20,13 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+            .csrf().disable()
+            .authorizeRequests()
+                .antMatchers("/**")
+                .permitAll()
+            //.anyRequest()
+            //.authenticated()
+            .and()
             .sessionManagement()
             .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             .and()
@@ -33,8 +40,12 @@ public class SecurityConfig {
                 })
             )
             .oauth2ResourceServer(oauth2 -> oauth2
-                    .jwt(jwt -> jwt.jwtAuthenticationConverter(new JWTConverter())));
+                    .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtConverter())));
 
         return http.build();
+    }
+
+    private JWTConverter jwtConverter() {
+        return new JWTConverter();
     }
 }

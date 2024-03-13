@@ -9,5 +9,6 @@ import java.time.LocalTime;
 public class AvailabilityRequest {
     private Long teacherId;
     private DayOfWeek dayOfWeek;
-    private LocalTime time;
+    private LocalTime endTime;
+    private LocalTime startTime;
 }

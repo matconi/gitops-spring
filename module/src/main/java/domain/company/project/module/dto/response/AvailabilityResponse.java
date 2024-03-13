@@ -10,5 +10,6 @@ public class AvailabilityResponse {
     private Long id;
     private TeacherResponse teacherResponse;
     private DayOfWeek dayOfWeek;
-    private LocalTime time;
+    private LocalTime endTime;
+    private LocalTime startTime;
 }

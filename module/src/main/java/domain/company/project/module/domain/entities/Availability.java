@@ -3,7 +3,6 @@ package domain.company.project.module.domain.entities;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.optaplanner.core.api.domain.lookup.PlanningId;
 
 import javax.persistence.*;
 import java.time.DayOfWeek;
@@ -26,6 +25,18 @@ public class Availability {
     @Column(name = "dayOfWeek", length = 120, nullable = false)
     private DayOfWeek dayOfWeek;
 
-    @Column(name = "time", length = 120, nullable = false)
-    private LocalTime time;
+    @Column(name = "startTime", length = 120)
+    private LocalTime startTime;
+
+    @Column(name = "endTime", length = 120)
+    private LocalTime endTime;
+
+    @Override
+    public String toString() {
+        return "Availability{" +
+                "dayOfWeek=" + dayOfWeek +
+                ", startTime=" + startTime +
+                ", endTime=" + endTime +
+                '}';
+    }
 }
