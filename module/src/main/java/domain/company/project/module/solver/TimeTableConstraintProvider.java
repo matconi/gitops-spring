@@ -1,14 +1,20 @@
 package domain.company.project.module.solver;
 
-
-import domain.company.project.module.domain.entities.Lesson;
-import org.optaplanner.core.api.score.buildin.hardsoft.HardSoftScore;
-import org.optaplanner.core.api.score.stream.Constraint;
-import org.optaplanner.core.api.score.stream.ConstraintFactory;
-import org.optaplanner.core.api.score.stream.ConstraintProvider;
-import org.optaplanner.core.api.score.stream.Joiners;
-
 import java.time.Duration;
+import java.time.LocalTime;
+import java.util.List;
+
+import ai.timefold.solver.core.api.score.buildin.hardsoft.HardSoftScore;
+import ai.timefold.solver.core.api.score.stream.Constraint;
+import ai.timefold.solver.core.api.score.stream.ConstraintFactory;
+import ai.timefold.solver.core.api.score.stream.ConstraintProvider;
+import ai.timefold.solver.core.api.score.stream.Joiners;
+
+import domain.company.project.module.config.TimeTableConstraintConfiguration;
+import domain.company.project.module.domain.entities.Availability;
+import domain.company.project.module.domain.entities.Lesson;
+import domain.company.project.module.domain.entities.Teacher;
+import domain.company.project.module.solver.justifications.*;
 
 public class TimeTableConstraintProvider implements ConstraintProvider {
 
@@ -19,6 +25,7 @@ public class TimeTableConstraintProvider implements ConstraintProvider {
                 roomConflict(constraintFactory),
                 teacherConflict(constraintFactory),
                 studentGroupConflict(constraintFactory),
+                teacherAvailableConflict(constraintFactory),
                 // Soft constraints
                 teacherRoomStability(constraintFactory),
                 teacherTimeEfficiency(constraintFactory),
@@ -36,8 +43,9 @@ public class TimeTableConstraintProvider implements ConstraintProvider {
                         // ... in the same room ...
                         Joiners.equal(Lesson::getRoom))
                 // ... and penalize each pair with a hard weight.
-                .penalize(HardSoftScore.ONE_HARD)
-                .asConstraint("Room conflict");
+                .penalizeConfigurable()
+                .justifyWith((lesson1, lesson2, score) -> new RoomConflictJustification(lesson1.getRoom(), lesson1, lesson2))
+                .asConstraint(TimeTableConstraintConfiguration.ROOM_CONFLICT);
     }
 
     Constraint teacherConflict(ConstraintFactory constraintFactory) {
@@ -46,8 +54,10 @@ public class TimeTableConstraintProvider implements ConstraintProvider {
                 .forEachUniquePair(Lesson.class,
                         Joiners.equal(Lesson::getTimeslot),
                         Joiners.equal(Lesson::getTeacher))
-                .penalize(HardSoftScore.ONE_HARD)
-                .asConstraint("Teacher conflict");
+                .penalizeConfigurable()
+                .justifyWith(
+                        (lesson1, lesson2, score) -> new TeacherConflictJustification(lesson1.getTeacher(), lesson1, lesson2))
+                .asConstraint(TimeTableConstraintConfiguration.TEACHER_CONFLICT);
     }
 
     Constraint studentGroupConflict(ConstraintFactory constraintFactory) {
@@ -56,8 +66,33 @@ public class TimeTableConstraintProvider implements ConstraintProvider {
                 .forEachUniquePair(Lesson.class,
                         Joiners.equal(Lesson::getTimeslot),
                         Joiners.equal(Lesson::getStudentGroup))
-                .penalize(HardSoftScore.ONE_HARD)
-                .asConstraint("Student group conflict");
+                .penalizeConfigurable()
+                .justifyWith((lesson1, lesson2, score) -> new StudentGroupConflictJustification(lesson1.getStudentGroup(), lesson1, lesson2))
+                .asConstraint(TimeTableConstraintConfiguration.STUDENT_GROUP_CONFLICT);
+    }
+
+    Constraint teacherAvailableConflict(ConstraintFactory constraintFactory) {
+        // A teacher can teach at most one lesson at the same time.
+        return constraintFactory
+                .forEach(Lesson.class)
+                .filter((lesson) -> {
+                    LocalTime lessonStart = lesson.getTimeslot().getStartTime();
+                    LocalTime lessonEnd = lesson.getTimeslot().getEndTime();
+                    List<Availability> availabilities = lesson.getTeacher().getAvailabilities().stream()
+                        .filter(
+                            availability -> availability.getDayOfWeek().equals(lesson.getTimeslot().getDayOfWeek())
+                            && (lessonStart.isBefore(availability.getEndTime()) || lessonStart.equals(availability.getEndTime()))
+                            && (lessonEnd.isAfter(availability.getStartTime()) || lessonStart.equals(availability.getStartTime()))
+                            && !availability.getEndTime().isBefore(lessonEnd)
+                            && !availability.getStartTime().isAfter(lessonStart)
+                        )
+                        .toList();
+                    return availabilities.isEmpty();
+                })
+                .penalizeConfigurable()
+                .justifyWith(
+                        (lesson, score) -> new TeacherAvailabilityConflictJustification(lesson.getTeacher(), lesson))
+                .asConstraint(TimeTableConstraintConfiguration.TEACHER_AVAILABILITY_CONFLICT);
     }
 
     Constraint teacherRoomStability(ConstraintFactory constraintFactory) {
@@ -67,22 +102,24 @@ public class TimeTableConstraintProvider implements ConstraintProvider {
                         Joiners.equal(Lesson::getTeacher))
                 .filter((lesson1, lesson2) -> lesson1.getRoom() != lesson2.getRoom())
                 .penalize(HardSoftScore.ONE_SOFT)
-                .asConstraint("Teacher room stability");
+                .justifyWith((lesson1, lesson2, score) -> new TeacherRoomStabilityJustification(lesson1.getTeacher(), lesson1, lesson2))
+                .asConstraint(TimeTableConstraintConfiguration.TEACHER_ROOM_STABILITY);
     }
 
     Constraint teacherTimeEfficiency(ConstraintFactory constraintFactory) {
         // A teacher prefers to teach sequential lessons and dislikes gaps between lessons.
         return constraintFactory
-                .forEach(Lesson.class)
-                .join(Lesson.class, Joiners.equal(Lesson::getTeacher),
+                .forEachUniquePair(Lesson.class,
+                        Joiners.equal(Lesson::getTeacher),
                         Joiners.equal((lesson) -> lesson.getTimeslot().getDayOfWeek()))
                 .filter((lesson1, lesson2) -> {
                     Duration between = Duration.between(lesson1.getTimeslot().getEndTime(),
                             lesson2.getTimeslot().getStartTime());
                     return !between.isNegative() && between.compareTo(Duration.ofMinutes(30)) <= 0;
                 })
-                .reward(HardSoftScore.ONE_SOFT)
-                .asConstraint("Teacher time efficiency");
+                .rewardConfigurable()
+                .justifyWith((lesson1, lesson2, score) -> new TeacherTimeEfficiencyJustification(lesson1.getTeacher(), lesson1, lesson2))
+                .asConstraint(TimeTableConstraintConfiguration.TEACHER_TIME_EFFICIENCY);
     }
 
     Constraint studentGroupSubjectVariety(ConstraintFactory constraintFactory) {
@@ -98,8 +135,9 @@ public class TimeTableConstraintProvider implements ConstraintProvider {
                             lesson2.getTimeslot().getStartTime());
                     return !between.isNegative() && between.compareTo(Duration.ofMinutes(30)) <= 0;
                 })
-                .penalize(HardSoftScore.ONE_SOFT)
-                .asConstraint("Student group subject variety");
+                .penalizeConfigurable()
+                .justifyWith((lesson1, lesson2, score) -> new StudentGroupSubjectVarietyJustification(lesson1.getStudentGroup(), lesson1, lesson2))
+                .asConstraint(TimeTableConstraintConfiguration.STUDENT_GROUP_VARIETY);
     }
 
 }
