@@ -71,7 +71,8 @@ public class TimeTableController {
     }
     @PostMapping("/solve")
     public TimeTable solve(@RequestBody TimeTable problem) {
-        TimeTableConstraintConfiguration timeTableConstraintConfiguration = new TimeTableConstraintConfiguration(problem.getConstraints());
+        TimeTableConstraintConfiguration timeTableConstraintConfiguration =
+                new TimeTableConstraintConfiguration(problem.getConstraints(), timeTableService);
         problem.setTimeTableConstraintConfiguration(timeTableConstraintConfiguration);
         UUID problemId = UUID.randomUUID();
         // Submit the problem to start solving

@@ -1,5 +1,6 @@
 package domain.company.project.module.services;
 
+import ai.timefold.solver.core.api.score.buildin.hardsoft.HardSoftScore;
 import domain.company.project.module.domain.entities.Lesson;
 import domain.company.project.module.domain.entities.Room;
 import domain.company.project.module.domain.entities.Teacher;
@@ -8,6 +9,7 @@ import domain.company.project.module.repositories.LessonRepository;
 import domain.company.project.module.repositories.RoomRepository;
 import domain.company.project.module.repositories.TeacherRepository;
 import domain.company.project.module.repositories.TimeslotRepository;
+import domain.company.project.module.dto.request.UserConstraint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -28,8 +30,24 @@ public class TimeTableService {
     TeacherRepository teacherRepository;
     @Autowired
     LessonRepository lessonRepository;
+
+    public HardSoftScore applyWeight(UserConstraint constraint) {
+        if (constraint.getEnabled()) {
+            switch (constraint.getWeight()) {
+                case 1 -> {
+                    return HardSoftScore.ONE_SOFT;
+                }
+                case 2 -> {
+                    return HardSoftScore.ONE_HARD;
+                }
+                default -> {
+                    return HardSoftScore.ZERO;
+                }
+            }
+        }
+        return HardSoftScore.ZERO;
+    }
     public void generateDemoData() {
-        System.out.println("vem bosta");
         List<Timeslot> timeslotList = new ArrayList<>();
         timeslotList.add(new Timeslot(DayOfWeek.MONDAY, LocalTime.of(8, 30), LocalTime.of(9, 30)));
         timeslotList.add(new Timeslot(DayOfWeek.MONDAY, LocalTime.of(9, 30), LocalTime.of(10, 30)));
@@ -190,6 +208,5 @@ public class TimeTableService {
         lessonList.add(new Lesson("Physical education", lewis, "12th grade"));
         lessonList.add(new Lesson("Physical education", lewis, "12th grade"));
         lessonRepository.saveAll(lessonList);
-        System.out.println("vem mais bosta");
     }
 }

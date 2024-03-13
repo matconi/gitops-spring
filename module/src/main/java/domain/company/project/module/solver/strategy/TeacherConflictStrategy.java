@@ -1,7 +1,7 @@
 package domain.company.project.module.solver.strategy;
 
 import ai.timefold.solver.core.api.score.buildin.hardsoft.HardSoftScore;
-import domain.company.project.module.solver.UserConstraint;
+import domain.company.project.module.dto.request.UserConstraint;
 
 public class TeacherConflictStrategy implements ConstraintStrategy {
     @Override

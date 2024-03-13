@@ -16,6 +16,7 @@ Prévia do sistema de gerenciamento de grade horária.
 - Keycloak
 - Spring Cloud Gateway
 - Service Discovery (Eureka)
+- Timefold (otimizador de restrições)
 ## Contribuições
 
 Contribuições são bem-vindas. Sinta-se à vontade para abrir issues e pull requests para sugerir melhorias, corrigir problemas ou adicionar novas etapas.

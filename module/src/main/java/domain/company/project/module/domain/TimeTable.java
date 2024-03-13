@@ -12,7 +12,7 @@ import domain.company.project.module.config.TimeTableConstraintConfiguration;
 import domain.company.project.module.domain.entities.Lesson;
 import domain.company.project.module.domain.entities.Room;
 import domain.company.project.module.domain.entities.Timeslot;
-import domain.company.project.module.solver.UserConstraint;
+import domain.company.project.module.dto.request.UserConstraint;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

@@ -4,7 +4,8 @@ package domain.company.project.module.config;
 import ai.timefold.solver.core.api.domain.constraintweight.ConstraintConfiguration;
 import ai.timefold.solver.core.api.domain.constraintweight.ConstraintWeight;
 import ai.timefold.solver.core.api.score.buildin.hardsoft.HardSoftScore;
-import domain.company.project.module.solver.UserConstraint;
+import domain.company.project.module.services.TimeTableService;
+import domain.company.project.module.dto.request.UserConstraint;
 import lombok.Data;
 
 import java.util.List;
@@ -35,20 +36,20 @@ public class TimeTableConstraintConfiguration {
     @ConstraintWeight(STUDENT_GROUP_VARIETY)
     private HardSoftScore studentGroupVariety = HardSoftScore.ZERO; //soft
 
-    public TimeTableConstraintConfiguration(List<UserConstraint> constraints){
+    public TimeTableConstraintConfiguration(List<UserConstraint> constraints, TimeTableService service){
         constraints.forEach(constraint -> {
             switch (constraint.getName()) {
-                case ROOM_CONFLICT -> this.setRoomConflict(constraint.applyWeight());
-                case TEACHER_CONFLICT -> this.setTeacherConflict(constraint.applyWeight());
+                case ROOM_CONFLICT -> this.setRoomConflict(service.applyWeight(constraint));
+                case TEACHER_CONFLICT -> this.setTeacherConflict(service.applyWeight(constraint));
                 case STUDENT_GROUP_CONFLICT ->
-                        this.setStudentGroupConflict(constraint.applyWeight());
+                        this.setStudentGroupConflict(service.applyWeight(constraint));
                 case TEACHER_AVAILABILITY_CONFLICT ->
-                        this.setTeacherAvailabilityConflict(constraint.applyWeight());
+                        this.setTeacherAvailabilityConflict(service.applyWeight(constraint));
                 case TEACHER_ROOM_STABILITY ->
-                        this.setTeacherRoomStability(constraint.applyWeight());
+                        this.setTeacherRoomStability(service.applyWeight(constraint));
                 case TEACHER_TIME_EFFICIENCY ->
-                        this.setTeacherTimeEfficiency(constraint.applyWeight());
-                case STUDENT_GROUP_VARIETY -> this.setStudentGroupVariety(constraint.applyWeight());
+                        this.setTeacherTimeEfficiency(service.applyWeight(constraint));
+                case STUDENT_GROUP_VARIETY -> this.setStudentGroupVariety(service.applyWeight(constraint));
                 default -> {}
             }
         });
