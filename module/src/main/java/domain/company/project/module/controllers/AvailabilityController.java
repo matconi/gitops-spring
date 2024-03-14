@@ -1,12 +1,11 @@
 package domain.company.project.module.controllers;
 
-import domain.company.project.module.dto.request.AvailabilityRequest;
+import domain.company.project.module.dto.request.solver.AvailabilitySolverRequest;
 import domain.company.project.module.dto.response.AvailabilityResponse;
 import domain.company.project.module.services.AvailabilityService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,7 +17,7 @@ public class AvailabilityController {
     private AvailabilityService availabilityService;
 
     @PostMapping
-    public ResponseEntity<AvailabilityResponse> createAvailability(@RequestBody AvailabilityRequest availabilityRequest){
+    public ResponseEntity<AvailabilityResponse> createAvailability(@RequestBody AvailabilitySolverRequest availabilityRequest){
         AvailabilityResponse availabilityResponse = availabilityService.createAvailability(availabilityRequest);
         return new ResponseEntity<>(availabilityResponse, HttpStatus.CREATED);
     }
@@ -36,7 +35,7 @@ public class AvailabilityController {
     }
 
     @PutMapping
-    public ResponseEntity<AvailabilityResponse> updateAvailability(@RequestBody AvailabilityRequest availabilityRequest, @PathVariable Long id){
+    public ResponseEntity<AvailabilityResponse> updateAvailability(@RequestBody AvailabilitySolverRequest availabilityRequest, @PathVariable Long id){
         AvailabilityResponse availabilityResponse = availabilityService.updateAvailability(availabilityRequest, id);
         return new ResponseEntity<>(availabilityResponse, HttpStatus.OK);
     }

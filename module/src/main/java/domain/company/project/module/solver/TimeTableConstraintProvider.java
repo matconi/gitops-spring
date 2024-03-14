@@ -1,19 +1,15 @@
 package domain.company.project.module.solver;
 
 import java.time.Duration;
-import java.time.LocalTime;
-import java.util.List;
 
-import ai.timefold.solver.core.api.score.buildin.hardsoft.HardSoftScore;
 import ai.timefold.solver.core.api.score.stream.Constraint;
 import ai.timefold.solver.core.api.score.stream.ConstraintFactory;
 import ai.timefold.solver.core.api.score.stream.ConstraintProvider;
 import ai.timefold.solver.core.api.score.stream.Joiners;
 
 import domain.company.project.module.config.TimeTableConstraintConfiguration;
-import domain.company.project.module.domain.entities.Availability;
-import domain.company.project.module.domain.entities.Lesson;
-import domain.company.project.module.domain.entities.Teacher;
+import domain.company.project.module.dto.request.solver.LessonSolverRequest;
+import domain.company.project.module.dto.request.solver.AvailabilitySolverRequest;
 import domain.company.project.module.solver.justifications.*;
 
 public class TimeTableConstraintProvider implements ConstraintProvider {
@@ -37,11 +33,11 @@ public class TimeTableConstraintProvider implements ConstraintProvider {
         // A room can accommodate at most one lesson at the same time.
         return constraintFactory
                 // Select each pair of 2 different lessons ...
-                .forEachUniquePair(Lesson.class,
+                .forEachUniquePair(LessonSolverRequest.class,
                         // ... in the same timeslot ...
-                        Joiners.equal(Lesson::getTimeslot),
+                        Joiners.equal(LessonSolverRequest::getTimeslot),
                         // ... in the same room ...
-                        Joiners.equal(Lesson::getRoom))
+                        Joiners.equal(LessonSolverRequest::getRoom))
                 // ... and penalize each pair with a hard weight.
                 .penalizeConfigurable()
                 .justifyWith((lesson1, lesson2, score) -> new RoomConflictJustification(lesson1.getRoom(), lesson1, lesson2))
@@ -51,9 +47,9 @@ public class TimeTableConstraintProvider implements ConstraintProvider {
     Constraint teacherConflict(ConstraintFactory constraintFactory) {
         // A teacher can teach at most one lesson at the same time.
         return constraintFactory
-                .forEachUniquePair(Lesson.class,
-                        Joiners.equal(Lesson::getTimeslot),
-                        Joiners.equal(Lesson::getTeacher))
+                .forEachUniquePair(LessonSolverRequest.class,
+                        Joiners.equal(LessonSolverRequest::getTimeslot),
+                        Joiners.equal(LessonSolverRequest::getTeacher))
                 .penalizeConfigurable()
                 .justifyWith(
                         (lesson1, lesson2, score) -> new TeacherConflictJustification(lesson1.getTeacher(), lesson1, lesson2))
@@ -63,9 +59,9 @@ public class TimeTableConstraintProvider implements ConstraintProvider {
     Constraint studentGroupConflict(ConstraintFactory constraintFactory) {
         // A student can attend at most one lesson at the same time.
         return constraintFactory
-                .forEachUniquePair(Lesson.class,
-                        Joiners.equal(Lesson::getTimeslot),
-                        Joiners.equal(Lesson::getStudentGroup))
+                .forEachUniquePair(LessonSolverRequest.class,
+                        Joiners.equal(LessonSolverRequest::getTimeslot),
+                        Joiners.equal(LessonSolverRequest::getStudentGroup))
                 .penalizeConfigurable()
                 .justifyWith((lesson1, lesson2, score) -> new StudentGroupConflictJustification(lesson1.getStudentGroup(), lesson1, lesson2))
                 .asConstraint(TimeTableConstraintConfiguration.STUDENT_GROUP_CONFLICT);
@@ -74,34 +70,25 @@ public class TimeTableConstraintProvider implements ConstraintProvider {
     Constraint teacherAvailableConflict(ConstraintFactory constraintFactory) {
         // A teacher can teach at most one lesson at the same time.
         return constraintFactory
-                .forEach(Lesson.class)
-                .filter((lesson) -> {
-                    LocalTime lessonStart = lesson.getTimeslot().getStartTime();
-                    LocalTime lessonEnd = lesson.getTimeslot().getEndTime();
-                    List<Availability> availabilities = lesson.getTeacher().getAvailabilities().stream()
-                        .filter(
-                            availability -> availability.getDayOfWeek().equals(lesson.getTimeslot().getDayOfWeek())
-                            && (lessonStart.isBefore(availability.getEndTime()) || lessonStart.equals(availability.getEndTime()))
-                            && (lessonEnd.isAfter(availability.getStartTime()) || lessonStart.equals(availability.getStartTime()))
-                            && !availability.getEndTime().isBefore(lessonEnd)
-                            && !availability.getStartTime().isAfter(lessonStart)
-                        )
-                        .toList();
-                    return availabilities.isEmpty();
-                })
+                .forEach(LessonSolverRequest.class)
+                .join(AvailabilitySolverRequest.class,
+                        Joiners.equal((LessonSolverRequest lesson) -> lesson.getTeacher().getId(),
+                                AvailabilitySolverRequest::getTeacherId),
+                        Joiners.equal((LessonSolverRequest lesson) ->lesson.getTimeslot().getId(),
+                                (AvailabilitySolverRequest::getTimesoltId)))
                 .penalizeConfigurable()
                 .justifyWith(
-                        (lesson, score) -> new TeacherAvailabilityConflictJustification(lesson.getTeacher(), lesson))
+                        (lesson, availability,score) -> new TeacherAvailabilityConflictJustification(lesson.getTeacher(), lesson))
                 .asConstraint(TimeTableConstraintConfiguration.TEACHER_AVAILABILITY_CONFLICT);
     }
 
     Constraint teacherRoomStability(ConstraintFactory constraintFactory) {
         // A teacher prefers to teach in a single room.
         return constraintFactory
-                .forEachUniquePair(Lesson.class,
-                        Joiners.equal(Lesson::getTeacher))
+                .forEachUniquePair(LessonSolverRequest.class,
+                        Joiners.equal(LessonSolverRequest::getTeacher))
                 .filter((lesson1, lesson2) -> lesson1.getRoom() != lesson2.getRoom())
-                .penalize(HardSoftScore.ONE_SOFT)
+                .penalizeConfigurable()
                 .justifyWith((lesson1, lesson2, score) -> new TeacherRoomStabilityJustification(lesson1.getTeacher(), lesson1, lesson2))
                 .asConstraint(TimeTableConstraintConfiguration.TEACHER_ROOM_STABILITY);
     }
@@ -109,13 +96,13 @@ public class TimeTableConstraintProvider implements ConstraintProvider {
     Constraint teacherTimeEfficiency(ConstraintFactory constraintFactory) {
         // A teacher prefers to teach sequential lessons and dislikes gaps between lessons.
         return constraintFactory
-                .forEachUniquePair(Lesson.class,
-                        Joiners.equal(Lesson::getTeacher),
+                .forEachUniquePair(LessonSolverRequest.class,
+                        Joiners.equal(LessonSolverRequest::getTeacher),
                         Joiners.equal((lesson) -> lesson.getTimeslot().getDayOfWeek()))
                 .filter((lesson1, lesson2) -> {
                     Duration between = Duration.between(lesson1.getTimeslot().getEndTime(),
                             lesson2.getTimeslot().getStartTime());
-                    return !between.isNegative() && between.compareTo(Duration.ofMinutes(30)) <= 0;
+                    return !between.isNegative() && between.compareTo(Duration.ofMinutes(50)) <= 0;
                 })
                 .rewardConfigurable()
                 .justifyWith((lesson1, lesson2, score) -> new TeacherTimeEfficiencyJustification(lesson1.getTeacher(), lesson1, lesson2))
@@ -124,20 +111,21 @@ public class TimeTableConstraintProvider implements ConstraintProvider {
 
     Constraint studentGroupSubjectVariety(ConstraintFactory constraintFactory) {
         // A student group dislikes sequential lessons on the same subject.
+        // Em resumo, o código filtra pares de aulas onde a segunda começa dentro
+        // de X minutos após o término da primeira.
         return constraintFactory
-                .forEach(Lesson.class)
-                .join(Lesson.class,
-                        Joiners.equal(Lesson::getSubject),
-                        Joiners.equal(Lesson::getStudentGroup),
+                .forEach(LessonSolverRequest.class)
+                .join(LessonSolverRequest.class,
+                        Joiners.equal(LessonSolverRequest::getSubject),
+                        Joiners.equal(LessonSolverRequest::getStudentGroup),
                         Joiners.equal((lesson) -> lesson.getTimeslot().getDayOfWeek()))
                 .filter((lesson1, lesson2) -> {
                     Duration between = Duration.between(lesson1.getTimeslot().getEndTime(),
                             lesson2.getTimeslot().getStartTime());
-                    return !between.isNegative() && between.compareTo(Duration.ofMinutes(30)) <= 0;
+                    return !between.isNegative() && between.compareTo(Duration.ofMinutes(50)) <= 0;
                 })
-                .penalizeConfigurable()
+                .rewardConfigurable()
                 .justifyWith((lesson1, lesson2, score) -> new StudentGroupSubjectVarietyJustification(lesson1.getStudentGroup(), lesson1, lesson2))
                 .asConstraint(TimeTableConstraintConfiguration.STUDENT_GROUP_VARIETY);
     }
-
 }

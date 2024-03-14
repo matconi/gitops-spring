@@ -4,11 +4,9 @@ import domain.company.project.module.domain.entities.Lesson;
 import domain.company.project.module.domain.entities.Room;
 import domain.company.project.module.domain.entities.Teacher;
 import domain.company.project.module.domain.entities.Timeslot;
-import domain.company.project.module.dto.request.LessonRequest;
+import domain.company.project.module.dto.request.DefaultLessonRequest;
 import domain.company.project.module.dto.response.LessonResponse;
-import domain.company.project.module.dto.response.RoomResponse;
 import domain.company.project.module.dto.response.TeacherResponse;
-import domain.company.project.module.dto.response.TimeslotResponse;
 import domain.company.project.module.repositories.LessonRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,7 +25,7 @@ public class LessonService {
     private TimeslotService timeslotService;
 
 
-    public LessonResponse createLesson(LessonRequest request) {
+    public LessonResponse createLesson(DefaultLessonRequest request) {
         Lesson lesson = new Lesson();
         Teacher teacher = teacherService.findById(request.getTeacherId());
         Room room = roomService.findById(request.getRoomId());
@@ -82,7 +80,7 @@ public class LessonService {
         return response;
     }
 
-    public LessonResponse updateLesson(LessonRequest request, Long id) {
+    public LessonResponse updateLesson(DefaultLessonRequest request, Long id) {
         Lesson lesson = this.findById(id);
         Teacher teacher = teacherService.findById(request.getTeacherId());
         Room room = roomService.findById(request.getRoomId());
@@ -117,17 +115,17 @@ public class LessonService {
         teacherResponse.setEmail(lesson.getTeacher().getEmail());
         response.setTeacherResponse(teacherResponse);
 
-        TimeslotResponse timeslotResponse = new TimeslotResponse();
-        timeslotResponse.setId(lesson.getTimeslot().getId());
-        timeslotResponse.setId(lesson.getTimeslot().getId());
-        timeslotResponse.setDayOfWeek(lesson.getTimeslot().getDayOfWeek());
-        timeslotResponse.setStartTime(lesson.getTimeslot().getStartTime());
-        timeslotResponse.setEndTime(lesson.getTimeslot().getEndTime());
-        response.setTimeslotResponse(timeslotResponse);
+       // TimeslotResponse timeslotResponse = new TimeslotResponse();
+       // timeslotResponse.setId(lesson.getTimeslot().getId());
+        //timeslotResponse.setId(lesson.getTimeslot().getId());
+       // timeslotResponse.setDayOfWeek(lesson.getTimeslot().getDayOfWeek());
+       // timeslotResponse.setStartTime(lesson.getTimeslot().getStartTime());
+       // timeslotResponse.setEndTime(lesson.getTimeslot().getEndTime());
+        response.setTimeslotResponse(null);
 
-        RoomResponse roomResponse = new RoomResponse();
-        roomResponse.setId(lesson.getRoom().getId());
-        roomResponse.setName(lesson.getRoom().getName());
-        response.setRoomResponse(roomResponse);
+       // RoomResponse roomResponse = new RoomResponse();
+      //  roomResponse.setId(lesson.getRoom().getId());
+       // roomResponse.setName(lesson.getRoom().getName());
+        response.setRoomResponse(null);
     }
 }

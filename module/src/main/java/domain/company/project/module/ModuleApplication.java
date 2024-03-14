@@ -6,7 +6,10 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 //import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 
 @SpringBootApplication
-@EntityScan(basePackages = {"domain.company.project.module.domain"})
+@EntityScan(basePackages = {
+        "domain.company.project.module.domain",
+        "domain.company.project.module.dto.request.solver"
+         })
 //@EnableEurekaClient
 public class ModuleApplication {
     public static void main(String[] args) {

@@ -1,12 +1,11 @@
 package domain.company.project.module.controllers;
 
-import domain.company.project.module.dto.request.LessonRequest;
+import domain.company.project.module.dto.request.DefaultLessonRequest;
 import domain.company.project.module.dto.response.LessonResponse;
 import domain.company.project.module.services.LessonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,13 +17,13 @@ public class LessonController {
     private LessonService lessonService;
 
     @PostMapping
-    public ResponseEntity<LessonResponse> createLesson(@RequestBody LessonRequest lessonRequest){
+    public ResponseEntity<LessonResponse> createLesson(@RequestBody DefaultLessonRequest lessonRequest){
         LessonResponse lessonResponse = lessonService.createLesson(lessonRequest);
         return new ResponseEntity<>(lessonResponse, HttpStatus.CREATED);
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    //@PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<LessonResponse>> listLessons(){
         List<LessonResponse> lessones = lessonService.listLessons();
         return ResponseEntity.ok(lessones);
@@ -37,7 +36,7 @@ public class LessonController {
     }
 
     @PutMapping
-    public ResponseEntity<LessonResponse> updateLesson(@RequestBody LessonRequest lessonRequest, @PathVariable Long id){
+    public ResponseEntity<LessonResponse> updateLesson(@RequestBody DefaultLessonRequest lessonRequest, @PathVariable Long id){
         LessonResponse lessonResponse = lessonService.updateLesson(lessonRequest, id);
         return new ResponseEntity<>(lessonResponse, HttpStatus.OK);
     }

@@ -14,12 +14,11 @@ import java.time.LocalTime;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@JsonIdentityInfo(scope = Timeslot.class, generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+//@JsonIdentityInfo(scope = Timeslot.class, generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 @Entity
 @Table(name = "timeslots")
 public class Timeslot {
 
-    @PlanningId
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

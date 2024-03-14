@@ -9,10 +9,11 @@ import ai.timefold.solver.core.api.domain.valuerange.ValueRangeProvider;
 import ai.timefold.solver.core.api.score.buildin.hardsoft.HardSoftScore;
 import ai.timefold.solver.core.api.solver.SolverStatus;
 import domain.company.project.module.config.TimeTableConstraintConfiguration;
-import domain.company.project.module.domain.entities.Lesson;
-import domain.company.project.module.domain.entities.Room;
-import domain.company.project.module.domain.entities.Timeslot;
-import domain.company.project.module.dto.request.UserConstraint;
+import domain.company.project.module.dto.request.*;
+import domain.company.project.module.dto.request.solver.LessonSolverRequest;
+import domain.company.project.module.dto.request.solver.AvailabilitySolverRequest;
+import domain.company.project.module.dto.request.solver.RoomSolverRequest;
+import domain.company.project.module.dto.request.solver.TimeslotSolverRequest;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -30,14 +31,18 @@ public class TimeTable {
 
     @ProblemFactCollectionProperty
     @ValueRangeProvider
-    private List<Timeslot> timeslots;
+    private List<TimeslotSolverRequest> timeslots;
 
     @ProblemFactCollectionProperty
     @ValueRangeProvider
-    private List<Room> rooms;
+    private List<RoomSolverRequest> rooms;
 
     @PlanningEntityCollectionProperty
-    private List<Lesson> lessons;
+    private List<LessonSolverRequest> lessons;
+
+    @ProblemFactCollectionProperty
+    @ValueRangeProvider
+    private List<AvailabilitySolverRequest> availabilities;
 
     @PlanningScore
     private HardSoftScore score;

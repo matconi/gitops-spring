@@ -1,14 +1,10 @@
 package domain.company.project.module.services;
 
 import domain.company.project.module.domain.entities.Availability;
-import domain.company.project.module.domain.entities.Room;
 import domain.company.project.module.domain.entities.Teacher;
-import domain.company.project.module.domain.entities.Timeslot;
-import domain.company.project.module.dto.request.AvailabilityRequest;
+import domain.company.project.module.dto.request.solver.AvailabilitySolverRequest;
 import domain.company.project.module.dto.response.AvailabilityResponse;
-import domain.company.project.module.dto.response.RoomResponse;
 import domain.company.project.module.dto.response.TeacherResponse;
-import domain.company.project.module.dto.response.TimeslotResponse;
 import domain.company.project.module.repositories.AvailabilityRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,14 +23,14 @@ public class AvailabilityService {
     private TimeslotService timeslotService;
 
 
-    public AvailabilityResponse createAvailability(AvailabilityRequest request) {
+    public AvailabilityResponse createAvailability(AvailabilitySolverRequest request) {
         Availability availability = new Availability();
         Teacher teacher = teacherService.findById(request.getTeacherId());
 
-        availability.setDayOfWeek(request.getDayOfWeek());
+        /*availability.setDayOfWeek(request.getDayOfWeek());
         availability.setTeacher(teacher);
         availability.setEndTime(request.getEndTime());
-        availability.setStartTime(request.getStartTime());
+        availability.setStartTime(request.getStartTime());*/
 
         Availability savedAvailability = availabilityRepository.save(availability);
 
@@ -58,10 +54,10 @@ public class AvailabilityService {
     private AvailabilityResponse convertAvailabilityTo(Availability availability) {
         AvailabilityResponse response = new AvailabilityResponse();
         response.setId(availability.getId());
-        response.setDayOfWeek(response.getDayOfWeek());
-        response.setEndTime(response.getEndTime());
-        response.setStartTime(response.getStartTime());
-        this.setRelatedResponse(availability, response);
+        response.setDayOfWeek(availability.getDayOfWeek());
+        response.setEndTime(availability.getEndTime());
+        response.setStartTime(availability.getStartTime());
+        //this.setRelatedResponse(availability, response);
 
         return response;
     }
@@ -82,14 +78,14 @@ public class AvailabilityService {
         return response;
     }
 
-    public AvailabilityResponse updateAvailability(AvailabilityRequest request, Long id) {
+    public AvailabilityResponse updateAvailability(AvailabilitySolverRequest request, Long id) {
         Availability availability = this.findById(id);
         Teacher teacher = teacherService.findById(request.getTeacherId());
 
-        availability.setDayOfWeek(request.getDayOfWeek());
+        /*availability.setDayOfWeek(request.getDayOfWeek());
         availability.setTeacher(teacher);
         availability.setEndTime(request.getEndTime());
-        availability.setStartTime(request.getStartTime());
+        availability.setStartTime(request.getStartTime());*/
 
         Availability savedAvailability = availabilityRepository.save(availability);
 

@@ -12,12 +12,11 @@ import javax.persistence.*;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@JsonIdentityInfo(scope = Timeslot.class, generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+//@JsonIdentityInfo(scope = Timeslot.class, generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 @Entity
 @Table(name = "rooms")
 public class Room {
 
-    @PlanningId
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

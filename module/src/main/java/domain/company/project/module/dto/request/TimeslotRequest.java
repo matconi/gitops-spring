@@ -7,6 +7,7 @@ import java.time.LocalTime;
 
 @Data
 public class TimeslotRequest {
+    private Long id;
     private DayOfWeek dayOfWeek;
     private LocalTime startTime;
     private LocalTime endTime;

@@ -41,9 +41,9 @@ public class TimeslotService {
     private TimeslotResponse convertTimeslotTo(Timeslot timeslot) {
         TimeslotResponse response = new TimeslotResponse();
         response.setId(timeslot.getId());
-        response.setDayOfWeek(response.getDayOfWeek());
-        response.setStartTime(response.getStartTime());
-        response.setEndTime(response.getEndTime());
+        response.setDayOfWeek(timeslot.getDayOfWeek());
+        response.setStartTime(timeslot.getStartTime());
+        response.setEndTime(timeslot.getEndTime());
 
         return response;
     }

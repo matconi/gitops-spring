@@ -12,12 +12,10 @@ import javax.persistence.*;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@PlanningEntity
 @Entity
 @Table(name = "lessons")
 public class Lesson {
 
-    @PlanningId
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -32,12 +30,10 @@ public class Lesson {
     @Column(name = "studentGroup", length = 120, nullable = false)
     private String studentGroup;
 
-    @PlanningVariable
     @ManyToOne
     @JoinColumn(name = "timeslot_id")
     private Timeslot timeslot;
 
-    @PlanningVariable
     @ManyToOne
     @JoinColumn(name = "room_id")
     private Room room;

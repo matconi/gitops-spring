@@ -33,8 +33,12 @@ spring:
 timefold:
   solver:
     termination:
-      spent-limit: 5s
-
+      spent-limit: 25s
+# 5s: "score": "-10hard/-164soft"
+# 20s: "score": "-10hard/-31soft",
+# 25s: "score": "-10hard/-5soft"
+# 40s: "score": "-10hard/16soft",
+# 25s sem disponibility: "score": "0hard/17soft",
 logging:
   level:
     ai:
